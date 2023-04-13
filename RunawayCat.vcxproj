@@ -133,11 +133,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="RunawayCat.cpp" />
     <ClCompile Include="LTexture.cpp" />
+    <ClCompile Include="RunawayCat.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Enermy.h" />
+    <ClInclude Include="Food.h" />
     <ClInclude Include="LTexture.h" />
+    <ClInclude Include="TextTexture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

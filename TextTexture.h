@@ -1,60 +1,23 @@
-#pragma once
-#include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <sstream>
-#include <assert.h>
-#include <algorithm>
-#include <math.h>
-#include <string.h>
-#include <limits.h>
-#include <numeric>
-#include <chrono>
-#include <random>
-#include <functional>
-#include <tuple>
-#include <vector>
-#include <queue>
-#include <stack>
-#include <map>
-#include <set>
-#include <array>
-#include <bitset>
-#include <unordered_map>
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-#include <SDL_mixer.h>
+﻿#pragma once
+#include "LTexture.h"
 
 using namespace std;
 
-//Width and height of the screen
-const int SCREEN_WIDTH = 1368;
-const int SCREEN_HEIGHT = 768;
 
-//The renderer we'll be using
-SDL_Renderer* gRenderer;
-
-// The window we'll be rendering to
-SDL_Window* gWindow;
-
-//Globally used font
-TTF_Font* gFont;
-
-class LTexture
+class TextTexture
 {
 public:
 	//Initializes variables
-	LTexture();
+	TextTexture();
 
 	//Deallocates memory
-	~LTexture();
+	~TextTexture();
 
 	//Loads image at specified path
 	bool loadFromFile(std::string path);
 
 	//Creates image from font string
-	bool loadFromRenderedText(string textureText, SDL_Color textColor);
+	bool loadFromRenderedText(std::string textureText, Uint8 r, Uint8 g, Uint8 b);
 
 	//Deallocates texture
 	void free();
@@ -103,7 +66,7 @@ private:
 	int mVelX, mVelY;
 };
 
-LTexture::LTexture()
+TextTexture::TextTexture()
 {
 	//Initialize
 	mTexture = NULL;
@@ -115,13 +78,13 @@ LTexture::LTexture()
 	mVelY = 0;
 }
 
-LTexture::~LTexture()
+TextTexture::~TextTexture()
 {
 	//Deallocate
 	free();
 }
 
-bool LTexture::loadFromFile(std::string path)
+bool TextTexture::loadFromFile(std::string path)
 {
 	//Get rid of preexisting texture
 	free();
@@ -162,10 +125,13 @@ bool LTexture::loadFromFile(std::string path)
 	return mTexture != NULL;
 }
 
-bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColor)
+bool TextTexture::loadFromRenderedText(std::string textureText, Uint8 r, Uint8 g, Uint8 b)
 {
 	//Get rid of preexisting texture
 	free();
+
+	//Color
+	SDL_Color textColor{ r, g, b };
 
 	//Render text surface
 	SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, textureText.c_str(), textColor);
@@ -196,7 +162,7 @@ bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColor
 	return mTexture != NULL;
 }
 
-void LTexture::free()
+void TextTexture::free()
 {
 	//Free texture if it exists
 	if (mTexture != NULL)
@@ -208,25 +174,25 @@ void LTexture::free()
 	}
 }
 
-void LTexture::setColor(Uint8 red, Uint8 green, Uint8 blue)
+void TextTexture::setColor(Uint8 red, Uint8 green, Uint8 blue)
 {
 	//Modulate texture rgb
 	SDL_SetTextureColorMod(mTexture, red, green, blue);
 }
 
-void LTexture::setBlendMode(SDL_BlendMode blending)
+void TextTexture::setBlendMode(SDL_BlendMode blending)
 {
 	//Set blending function
 	SDL_SetTextureBlendMode(mTexture, blending);
 }
 
-void LTexture::setAlpha(Uint8 alpha)
+void TextTexture::setAlpha(Uint8 alpha)
 {
 	//Modulate texture alpha
 	SDL_SetTextureAlphaMod(mTexture, alpha);
 }
 
-void LTexture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
+void TextTexture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
 	//Set rendering space and render to screen
 	SDL_Rect renderQuad = { x, y, mWidth, mHeight };
@@ -242,34 +208,34 @@ void LTexture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* cen
 	SDL_RenderCopyEx(gRenderer, mTexture, clip, &renderQuad, angle, center, flip);
 }
 
-int LTexture::getWidth()
+int TextTexture::getWidth()
 {
 	return mWidth;
 }
 
-int LTexture::getHeight()
+int TextTexture::getHeight()
 {
 	return mHeight;
 }
 
-void LTexture::setVelocity(int vx, int vy) {
+void TextTexture::setVelocity(int vx, int vy) {
 	mVelX = vx;
 	mVelY = vy;
 }
 
-int LTexture::getX() {
+int TextTexture::getX() {
 	return mPosX;
 }
 
-int LTexture::getY() {
+int TextTexture::getY() {
 	return mPosY;
 }
 
-void LTexture::move() {
+void TextTexture::move() {
 	mPosX += mVelX;
 	mPosY += mVelY;
 
-	// Gi?i h?n v? tr� c?a LTexture trong khu v?c c?a c?a s?
+	// Gi?i h?n v? trí c?a TextTexture trong khu v?c c?a c?a s?
 	if (mPosX < 0) {
 		mVelX = -mVelX;
 		//mPosX = 0;
@@ -289,18 +255,17 @@ void LTexture::move() {
 	}
 }
 
-void LTexture::setPos(int x, int y) {
+void TextTexture::setPos(int x, int y) {
 	mPosX = x;
 	mPosY = y;
 }
 
-int LTexture::getXVelocity()
+int TextTexture::getXVelocity()
 {
 	return mVelX;
 }
 
-int LTexture::getYVelocity()
+int TextTexture::getYVelocity()
 {
 	return mVelY;
 }
-

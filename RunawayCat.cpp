@@ -1,268 +1,26 @@
 ﻿#include "LTexture.h"
-using namespace std;
+#include "Enermy.h"
+#include "Food.h"
+#include "TextTexture.h"
 
-// The window we'll be rendering to
-SDL_Window* gWindow = NULL;
+using namespace std;
 
 SDL_Surface* icon = NULL;
 SDL_Cursor* cursor = NULL;
 LTexture cat, mouse_computer, cat_cry, game_over_image, background;
-
-//-------------------------Enermy class------------------------
-class Enermy
-{
-public:
-	//Initializes variables
-	Enermy();
-
-	//Deallocates memory
-	~Enermy();
-
-	//Loads image at specified path
-	bool loadFromFile(std::string path);
-
-	//Deallocates texture
-	void free();
-
-	//Set color modulation
-	void setColor(Uint8 red, Uint8 green, Uint8 blue);
-
-	//Set blending
-	void setBlendMode(SDL_BlendMode blending);
-
-	//Set alpha modulation
-	void setAlpha(Uint8 alpha);
-
-	//Renders texture at given point
-	void render(int x, int y, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
-
-	//Gets image dimensions
-	int getWidth();
-	int getHeight();
-
-	// Set velocity
-	void setVelocity(int vx, int vy);
-
-	// Get velocity in x and y direction
-	int getXVelocity();
-	int getYVelocity();
-
-	// Get position
-	int getX();
-	int getY();
-
-	void move();
-
-	void setPos(int x, int y);
-
-private:
-	//The actual hardware texture
-	SDL_Texture* mTexture;
-
-	//Image dimensions
-	int mWidth;
-	int mHeight;
-
-	int mPosX, mPosY;
-	int mVelX, mVelY;
-
-	bool renew_flag;
-};
-
 Enermy dog;
+Food pate;
+int Score = 0, armo = 0, Push_Count = 0;
+Uint32 startTime = SDL_GetTicks();
+TextTexture Font;
 
-Enermy::Enermy()
-{
-	//Initialize
-	mTexture = NULL;
-	mWidth = 0;
-	mHeight = 0;
-	mPosX = 0;
-	mPosY = 0;
-	mVelX = 0;
-	mVelY = 0;
-	renew_flag = false;
-}
-
-Enermy::~Enermy()
-{
-	//Deallocate
-	free();
-}
-
-bool Enermy::loadFromFile(std::string path)
-{
-	//Get rid of preexisting texture
-	free();
-
-	//The final texture
-	SDL_Texture* newTexture = NULL;
-
-	//Load image at specified path
-	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-	if (loadedSurface == NULL)
-	{
-		printf("Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError());
-	}
-	else
-	{
-		//Color key image
-		SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0, 0xFF, 0xFF));
-
-		//Create texture from surface pixels
-		newTexture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
-		if (newTexture == NULL)
-		{
-			printf("Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
-		}
-		else
-		{
-			//Get image dimensions
-			mWidth = loadedSurface->w;
-			mHeight = loadedSurface->h;
-		}
-
-		//Get rid of old loaded surface
-		SDL_FreeSurface(loadedSurface);
-	}
-
-	//Return success
-	mTexture = newTexture;
-	return mTexture != NULL;
-}
-
-void Enermy::free()
-{
-	//Free texture if it exists
-	if (mTexture != NULL)
-	{
-		SDL_DestroyTexture(mTexture);
-		mTexture = NULL;
-		mWidth = 0;
-		mHeight = 0;
-	}
-}
-
-void Enermy::setColor(Uint8 red, Uint8 green, Uint8 blue)
-{
-	//Modulate texture rgb
-	SDL_SetTextureColorMod(mTexture, red, green, blue);
-}
-
-void Enermy::setBlendMode(SDL_BlendMode blending)
-{
-	//Set blending function
-	SDL_SetTextureBlendMode(mTexture, blending);
-}
-
-void Enermy::setAlpha(Uint8 alpha)
-{
-	//Modulate texture alpha
-	SDL_SetTextureAlphaMod(mTexture, alpha);
-}
-
-void Enermy::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
-{
-	//Set rendering space and render to screen
-	SDL_Rect renderQuad = { x, y, mWidth, mHeight };
-
-	//Set clip rendering dimensions
-	if (clip != NULL)
-	{
-		renderQuad.w = clip->w;
-		renderQuad.h = clip->h;
-	}
-
-	//Render to screen
-	SDL_RenderCopyEx(gRenderer, mTexture, clip, &renderQuad, angle, center, flip);
-}
-
-int Enermy::getWidth()
-{
-	return mWidth;
-}
-
-int Enermy::getHeight()
-{
-	return mHeight;
-}
-
-void Enermy::setVelocity(int vx, int vy) {
-	mVelX = vx;
-	mVelY = vy;
-}
-
-int Enermy::getX() {
-	return mPosX;
-}
-
-int Enermy::getY() {
-	return mPosY;
-}
-
-void Enermy::move() {
-	mPosX += mVelX;
-	mPosY += mVelY;
-
-	//cout << "PosY: " << mPosY << " SCREEN_HEIGHT: " <<  SCREEN_HEIGHT << endl;
-
-	if (mPosY > SCREEN_HEIGHT)
-	{
-		renew_flag = true;
-	}
-
-	if (renew_flag)
-	{
-		renew_flag = false;
-		mPosX = rand() % (SCREEN_WIDTH - mWidth);
-		mPosY = -mHeight - 50;
-	}
-
-	/*
-	// Giới hạn vị trí của Enermy trong khu vực của cửa sổ
-	if (mPosX < 0) {
-		mVelX = -mVelX;
-		//mPosX = 0;
-	}
-	else if (mPosX > SCREEN_WIDTH - mWidth) {
-		mVelX = -mVelX;
-		//mPosX = SCREEN_WIDTH - mWidth;
-	}
-
-	if (mPosY < 0) {
-		mVelY = -mVelY;
-		//mPosY = 0;
-	}
-	else if (mPosY > SCREEN_HEIGHT - mHeight) {
-		mVelY = -mVelY;
-		//mPosY = SCREEN_HEIGHT - mHeight;
-	}
-	*/
-}
-
-void Enermy::setPos(int x, int y) {
-	mPosX = x;
-	mPosY = y;
-}
-
-int Enermy::getXVelocity()
-{
-	return mVelX;
-}
-
-int Enermy::getYVelocity()
-{
-	return mVelY;
-}
-
-//--------------------------------------------------------------
 bool init();
 bool loadMedia();
 void close();
 bool checkCollision(LTexture& a, Enermy& b);
+bool checkCollision(LTexture& a, Food& b);
 void initialize();
 
-//--------------------------------------------------------------
 bool init()
 {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -308,47 +66,55 @@ bool loadMedia() {
 	bool success = true;
 
 	// Tải hình ảnh background
-	if (background.loadFromFile("background.png") == false) {
+	if (background.loadFromFile("background2.png") == false) {
 		cout << "Failed to load background image" << endl;
+		success = false;
 	}
 
 	//Load cat
 	if (cat.loadFromFile("cat.png") == false) {
-		cout << "Failed load cat!" << endl;
+		cout << "Failed to load cat image!" << endl;
+		success = false;
 	}
 
 	//Load dog1
 	if (dog.loadFromFile("doggo.png") == false) {
-		cout << "Failed load doggo!" << endl;
+		cout << "Failed to load doggo image!" << endl;
+		success = false;
 	}
 
 	//Load game_over_image
 	if (game_over_image.loadFromFile("game_over_image.png") == false) {
-		cout << "Failed load game_over_image!" << endl;
-	}
-
-	//Load cat_cry
-	if (cat_cry.loadFromFile("cat_cry.png") == false) {
-		cout << "Failed cat_cry!" << endl;
-	}
-
-	/*
-	//Tải hình ảnh character
-	SDL_Surface* loadedSurface = IMG_Load("my_cat.png");
-	if (loadedSurface == nullptr) {
-		cout << "Unable to load image! SDL Error: " << SDL_GetError() << endl;
+		cout << "Failed to load game_over_image!" << endl;
 		success = false;
 	}
-	else {
-		Character = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
-		if (Character == nullptr) {
-			cout << "Unable to create texture from image! SDL Error: " << SDL_GetError() << endl;
-			success = false;
-		}
 
-		SDL_FreeSurface(loadedSurface);
+	//Load cat_cry image
+	if (cat_cry.loadFromFile("cat_cry.png") == false) {
+		cout << "Failed to load cat_cry image!" << endl;
+		success = false;
 	}
-	*/
+
+	//Load food image
+	if (pate.loadFromFile("pate.png") == false) {
+		cout << "Failed to load food!" << endl;
+		success = false;
+	}
+
+	//Open the font
+	gFont = TTF_OpenFont("RunawayCat_Font.ttf", 28);
+	if (gFont == NULL)
+	{
+		printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
+		success = false;
+	}
+
+	//Render text
+	if (!Font.loadFromRenderedText("ZuThanhThao?", 0, 0, 0))
+	{
+		printf("Failed to render text texture!\n");
+		success = false;
+	}
 
 	return success;
 }
@@ -359,6 +125,12 @@ void close() {
 	cat_cry.free();
 	game_over_image.free();
 	background.free();
+	pate.free();
+	Font.free();
+
+	//Free global font
+	TTF_CloseFont(gFont);
+	gFont = NULL;
 
 	SDL_DestroyRenderer(gRenderer);
 	gRenderer = nullptr;
@@ -370,6 +142,7 @@ void close() {
 	SDL_FreeCursor(cursor);
 	IMG_Quit();
 	SDL_Quit();
+	TTF_Quit();
 }
 
 bool checkCollision(LTexture& a, Enermy& b) //Kiểm tra va chạm
@@ -395,25 +168,60 @@ bool checkCollision(LTexture& a, Enermy& b) //Kiểm tra va chạm
 	return true;
 }
 
+bool checkCollision(LTexture& a, Food& b) //Kiểm tra va chạm
+{
+	//Xác định vùng chồng lấp giữa 2 hình chữ nhật
+	int leftA = a.getX();
+	int rightA = a.getX() + a.getWidth();
+	int topA = a.getY();
+	int bottomA = a.getY() + a.getHeight();
+
+	int leftB = b.getX();
+	int rightB = b.getX() + b.getWidth();
+	int topB = b.getY();
+	int bottomB = b.getY() + b.getHeight();
+
+	//Kiểm tra 2 hình chữ nhật có va chạm nhau hay không
+	if (bottomA <= topB || topA >= bottomB || rightA <= leftB || leftA >= rightB)
+	{
+		return false;
+	}
+
+	//Trả về kết quả
+	return true;
+}
+
+void Push_Calculator()
+{	
+	// Do something...
+	Uint32 deltaTime = SDL_GetTicks() - startTime;
+	int seconds = (float)deltaTime / 1000;
+	Push_Count += seconds / 3;
+}
+
 void initialize()
 {
+	//Set seed for random
+	srand(time(0));
 	//Chỉnh sửa chuột máy tính
 	SDL_Surface* icon = IMG_Load("popcat2_mini.png");
 	SDL_Cursor* cursor = SDL_CreateColorCursor(icon, 0, 0);
 	SDL_SetCursor(cursor);
 
+	//Set food position
+	pate.renew();
+
 	//Position cat first append
 	cat.setPos((SCREEN_WIDTH - cat.getWidth()) / 2, (SCREEN_HEIGHT - cat.getHeight()) / 2);
 	cat.setVelocity(0, 1);
-
-	srand(time(0));
-
-	//cout << "Now time is: " << time(0) << endl;
-
+	int Score = 0;
+	Push_Count = 1;
+	
 	//Set enermy velocity
-	dog.setVelocity(0, 4);
+	dog.setVelocity(0, 5);
 	dog.setPos(rand() % (SCREEN_WIDTH - dog.getWidth()), -dog.getHeight());
 }
+
 
 int main(int argc, char* args[])
 {
@@ -452,7 +260,7 @@ int main(int argc, char* args[])
 						//SDL_Delay(3000);
 						quit = true;
 					}
-					if (e.type == SDL_MOUSEBUTTONDOWN)
+					if (e.type == SDL_MOUSEBUTTONDOWN && Push_Count > 0)
 					{
 						//Mouse pos
 						int x_mouse = 0, y_mouse = 0;
@@ -464,24 +272,10 @@ int main(int argc, char* args[])
 						cout << push_x << " " << push_y << endl;
 
 						cat.setVelocity(push_x, push_y);
+						Push_Count--;
+						
 					}
 
-				}
-
-				//Kiểm tra va chạm
-				if (checkCollision(cat, dog))
-				{
-					GAME_OVER = true;
-				}
-
-				//Nếu đã va chạm thì dừng lại
-				if (GAME_OVER == true) {
-					//(cat_cry.render(cat.getX(), cat.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
-					//game_over_image.render((SCREEN_WIDTH - game_over_image.getWidth()) / 2, (SCREEN_HEIGHT - game_over_image.getHeight()) / 2, NULL, 0, NULL, SDL_FLIP_NONE);
-					//Load cat_cry
-					if (cat_cry.loadFromFile("cat_cry.png") == false) {
-						cout << "Failed cat_cry!" << endl;
-					}
 				}
 
 				//Clear screen
@@ -493,11 +287,42 @@ int main(int argc, char* args[])
 
 				//Here
 				cat.render(cat.getX(), cat.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
+				pate.render(pate.getX(), pate.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
 				dog.render(dog.getX(), dog.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
+				//Font.render(5, 5, NULL, 0, NULL, SDL_FLIP_NONE);
+
+				string cout_score = "Your Score: ";
+				cout_score += to_string(Score);
+				cout << cout_score << endl;
+				Font.loadFromRenderedText(cout_score, 0, 0, 0);
+				Font.render(5, 5, NULL, 0, NULL, SDL_FLIP_NONE);
 
 				//Chuyển động
 				cat.move();
 				dog.move();
+
+				//Kiểm tra va chạm
+				if (checkCollision(cat, dog))
+				{
+					GAME_OVER = true;
+				}
+				if (checkCollision(cat, pate))
+				{
+					Score++;
+					pate.renew();
+					//cout << "Score: " << Score << endl;
+				}
+
+				//Nếu đã va chạm thì dừng lại
+				if (GAME_OVER == true) {
+					cat.loadFromFile("cat_cry.png");
+					//cat.render(cat.getX(), cat.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
+					//cat_cry.render(cat.getX(), cat.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
+					game_over_image.render((SCREEN_WIDTH - game_over_image.getWidth()) / 2, (SCREEN_HEIGHT - game_over_image.getHeight()) / 2, NULL, 0, NULL, SDL_FLIP_NONE);
+					//Update screen
+					SDL_RenderPresent(gRenderer);
+				}
+				Push_Calculator();
 
 				//Update screen
 				SDL_RenderPresent(gRenderer);

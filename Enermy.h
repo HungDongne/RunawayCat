@@ -1,60 +1,17 @@
-#pragma once
-#include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <sstream>
-#include <assert.h>
-#include <algorithm>
-#include <math.h>
-#include <string.h>
-#include <limits.h>
-#include <numeric>
-#include <chrono>
-#include <random>
-#include <functional>
-#include <tuple>
-#include <vector>
-#include <queue>
-#include <stack>
-#include <map>
-#include <set>
-#include <array>
-#include <bitset>
-#include <unordered_map>
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-#include <SDL_mixer.h>
+﻿#pragma once
+#include "LTexture.h"
 
-using namespace std;
-
-//Width and height of the screen
-const int SCREEN_WIDTH = 1368;
-const int SCREEN_HEIGHT = 768;
-
-//The renderer we'll be using
-SDL_Renderer* gRenderer;
-
-// The window we'll be rendering to
-SDL_Window* gWindow;
-
-//Globally used font
-TTF_Font* gFont;
-
-class LTexture
+class Enermy
 {
 public:
 	//Initializes variables
-	LTexture();
+	Enermy();
 
 	//Deallocates memory
-	~LTexture();
+	~Enermy();
 
 	//Loads image at specified path
 	bool loadFromFile(std::string path);
-
-	//Creates image from font string
-	bool loadFromRenderedText(string textureText, SDL_Color textColor);
 
 	//Deallocates texture
 	void free();
@@ -90,7 +47,6 @@ public:
 
 	void setPos(int x, int y);
 
-
 private:
 	//The actual hardware texture
 	SDL_Texture* mTexture;
@@ -101,9 +57,11 @@ private:
 
 	int mPosX, mPosY;
 	int mVelX, mVelY;
+
+	bool renew_flag;
 };
 
-LTexture::LTexture()
+Enermy::Enermy()
 {
 	//Initialize
 	mTexture = NULL;
@@ -113,15 +71,16 @@ LTexture::LTexture()
 	mPosY = 0;
 	mVelX = 0;
 	mVelY = 0;
+	renew_flag = false;
 }
 
-LTexture::~LTexture()
+Enermy::~Enermy()
 {
 	//Deallocate
 	free();
 }
 
-bool LTexture::loadFromFile(std::string path)
+bool Enermy::loadFromFile(std::string path)
 {
 	//Get rid of preexisting texture
 	free();
@@ -162,41 +121,7 @@ bool LTexture::loadFromFile(std::string path)
 	return mTexture != NULL;
 }
 
-bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColor)
-{
-	//Get rid of preexisting texture
-	free();
-
-	//Render text surface
-	SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, textureText.c_str(), textColor);
-	if (textSurface == NULL)
-	{
-		printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
-	}
-	else
-	{
-		//Create texture from surface pixels
-		mTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
-		if (mTexture == NULL)
-		{
-			printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
-		}
-		else
-		{
-			//Get image dimensions
-			mWidth = textSurface->w;
-			mHeight = textSurface->h;
-		}
-
-		//Get rid of old surface
-		SDL_FreeSurface(textSurface);
-	}
-
-	//Return success
-	return mTexture != NULL;
-}
-
-void LTexture::free()
+void Enermy::free()
 {
 	//Free texture if it exists
 	if (mTexture != NULL)
@@ -208,25 +133,25 @@ void LTexture::free()
 	}
 }
 
-void LTexture::setColor(Uint8 red, Uint8 green, Uint8 blue)
+void Enermy::setColor(Uint8 red, Uint8 green, Uint8 blue)
 {
 	//Modulate texture rgb
 	SDL_SetTextureColorMod(mTexture, red, green, blue);
 }
 
-void LTexture::setBlendMode(SDL_BlendMode blending)
+void Enermy::setBlendMode(SDL_BlendMode blending)
 {
 	//Set blending function
 	SDL_SetTextureBlendMode(mTexture, blending);
 }
 
-void LTexture::setAlpha(Uint8 alpha)
+void Enermy::setAlpha(Uint8 alpha)
 {
 	//Modulate texture alpha
 	SDL_SetTextureAlphaMod(mTexture, alpha);
 }
 
-void LTexture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
+void Enermy::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
 	//Set rendering space and render to screen
 	SDL_Rect renderQuad = { x, y, mWidth, mHeight };
@@ -242,34 +167,49 @@ void LTexture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* cen
 	SDL_RenderCopyEx(gRenderer, mTexture, clip, &renderQuad, angle, center, flip);
 }
 
-int LTexture::getWidth()
+int Enermy::getWidth()
 {
 	return mWidth;
 }
 
-int LTexture::getHeight()
+int Enermy::getHeight()
 {
 	return mHeight;
 }
 
-void LTexture::setVelocity(int vx, int vy) {
+void Enermy::setVelocity(int vx, int vy) {
 	mVelX = vx;
 	mVelY = vy;
 }
 
-int LTexture::getX() {
+int Enermy::getX() {
 	return mPosX;
 }
 
-int LTexture::getY() {
+int Enermy::getY() {
 	return mPosY;
 }
 
-void LTexture::move() {
+void Enermy::move() {
 	mPosX += mVelX;
 	mPosY += mVelY;
 
-	// Gi?i h?n v? tr� c?a LTexture trong khu v?c c?a c?a s?
+	//cout << "PosY: " << mPosY << " SCREEN_HEIGHT: " <<  SCREEN_HEIGHT << endl;
+
+	if (mPosY > SCREEN_HEIGHT)
+	{
+		renew_flag = true;
+	}
+
+	if (renew_flag)
+	{
+		renew_flag = false;
+		mPosX = rand() % (SCREEN_WIDTH - mWidth);
+		mPosY = -mHeight - 50;
+	}
+
+	/*
+	// Giới hạn vị trí của Enermy trong khu vực của cửa sổ
 	if (mPosX < 0) {
 		mVelX = -mVelX;
 		//mPosX = 0;
@@ -287,20 +227,20 @@ void LTexture::move() {
 		mVelY = -mVelY;
 		//mPosY = SCREEN_HEIGHT - mHeight;
 	}
+	*/
 }
 
-void LTexture::setPos(int x, int y) {
+void Enermy::setPos(int x, int y) {
 	mPosX = x;
 	mPosY = y;
 }
 
-int LTexture::getXVelocity()
+int Enermy::getXVelocity()
 {
 	return mVelX;
 }
 
-int LTexture::getYVelocity()
+int Enermy::getYVelocity()
 {
 	return mVelY;
 }
-
