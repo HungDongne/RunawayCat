@@ -23,6 +23,7 @@ LTexture Font;
 Enermy dog;
 Enermy dog2;
 Food pate;
+LTexture restart;
 
 bool GAME_OVER = false;
 float avgFPS = 0;

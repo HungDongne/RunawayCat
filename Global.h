@@ -30,6 +30,7 @@ extern LTexture Font;
 extern Enermy dog;
 extern Enermy dog2;
 extern Food pate;
+extern LTexture restart;
 
 extern bool GAME_OVER;
 

@@ -95,6 +95,13 @@ bool loadMedia() {
 		success = false;
 	}
 
+	//Load restart rect
+	if (restart.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/wonderful.png") == false)
+	{
+		cout << "Failed to load restart image" << endl;
+		success = false;
+	}
+
 	//Open the font
 	gFont = TTF_OpenFont("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/fonts/Roboto-BlackItalic.ttf", 28);
 	if (gFont == NULL)
@@ -166,6 +173,7 @@ void close() {
 	Font.free();
 	gFPSTextTexture.free();
 	Arrow.free();
+	restart.free();
 
 
 	//Free sound
@@ -248,9 +256,7 @@ bool checkCollision(LTexture& a, Food& b) //Kiểm tra va chạm
 
 void Push_Calculator()
 {
-	// Do something...
 	Uint32 deltaTime = SDL_GetTicks();
-	//Uint32 deltaTime = SDL_GetTicks() - startTime;
 	int seconds = (float)deltaTime / 1000;
 	Push_Count += seconds / 1.5;
 }
@@ -263,15 +269,15 @@ void initialize()
 	SDL_Surface* icon = IMG_Load("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/popcat2_mini.png");
 	SDL_Cursor* cursor = SDL_CreateColorCursor(icon, 0, 0);
 	SDL_SetCursor(cursor);
-
+	Score = 0;
+	startTime = SDL_GetTicks();
 	//Set food position
 	pate.renew();
-
 	//Position cat first append
 	cat.setPos((SCREEN_WIDTH - cat.getWidth()) / 2, (SCREEN_HEIGHT - cat.getHeight()) / 2);
 	cat.setVelocity(0, 1);
-	int Score = 0;
-	Push_Count = 1;
+	cat.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/cat.png");
+	Push_Count = 3;
 
 	//Set enermy information
 	dog.setVelocity(0, 1);
@@ -294,21 +300,8 @@ void gamecalculator()
 	//Mouse pos
 	SDL_GetMouseState(&x_mouse, &y_mouse);
 
-	//In memory text stream
-	stringstream timeText;
-
-	//Set text to be rendered
-	timeText.str("");
-	timeText << "FPS: " << fixed << setprecision(1) << avgFPS;
-
-	//Render text
-	if (!gFPSTextTexture.loadFromRenderedText(timeText.str().c_str(), 0, 0, 0))
-	{
-		printf("Unable to render FPS texture!\n");
-	}
-
 	//Chuyển động
-	dog2.setVelocity(0, SDL_GetTicks() / 4000 + 1);
+	dog2.setVelocity(0, (SDL_GetTicks() - startTime) / 4000 + 1);
 	cat.move();
 	dog.move();
 	dog2.move();
@@ -348,18 +341,15 @@ void gamerender()
 {
 	//Render background to screen
 	background.render(0, 0, NULL, 0, NULL, SDL_FLIP_NONE);
-
 	//Render
 	pate.render(pate.getX(), pate.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
 	dog.render(dog.getX(), dog.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
 	dog2.render(dog2.getX(), dog2.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
 	cat.render(cat.getX(), cat.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
 	Arrow.render(Arrow.getX(), Arrow.getY(), NULL, angle_arrow, NULL, SDL_FLIP_NONE);
-	if (GAME_OVER) game_over_image.render((SCREEN_WIDTH - game_over_image.getWidth()) / 2, (SCREEN_HEIGHT - game_over_image.getHeight()) / 2, NULL, 0, NULL, SDL_FLIP_NONE);
-
-
-	//Render FPS
-	gFPSTextTexture.render(5, 5 + Font.getHeight() + 5, NULL, 0, NULL, SDL_FLIP_NONE);
+	if (GAME_OVER) {
+		game_over_image.render((SCREEN_WIDTH - game_over_image.getWidth()) / 2, (SCREEN_HEIGHT - game_over_image.getHeight()) / 2, NULL, 0, NULL, SDL_FLIP_NONE);
+	}
 	Font.render(5, 5, NULL, 0, NULL, SDL_FLIP_NONE);
 }
 
