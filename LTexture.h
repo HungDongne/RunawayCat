@@ -18,8 +18,11 @@ public:
 	//Loads image at specified path
 	bool loadFromFile(std::string path);
 
+
+	#if defined(SDL_TTF_MAJOR_VERSION)
 	//Creates image from font string
 	bool loadFromRenderedText(string textureText, Uint8 r, Uint8 g, Uint8 b);
+	#endif
 
 	//Deallocates texture
 	void free();
@@ -54,8 +57,6 @@ public:
 	void move();
 
 	void setPos(int x, int y);
-
-
 private:
 	//The actual hardware texture
 	SDL_Texture* mTexture;
@@ -67,7 +68,4 @@ private:
 	int mPosX, mPosY;
 	int mVelX, mVelY;
 };
-
-
-
 #endif // !LTEXTURE__H_

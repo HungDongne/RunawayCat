@@ -61,6 +61,7 @@ bool LTexture::loadFromFile(std::string path)
 	return mTexture != NULL;
 }
 
+#if defined(SDL_TTF_MAJOR_VERSION)
 bool LTexture::loadFromRenderedText(std::string textureText, Uint8 r, Uint8 g, Uint8 b)
 {
 	//Get rid of preexisting texture
@@ -96,6 +97,7 @@ bool LTexture::loadFromRenderedText(std::string textureText, Uint8 r, Uint8 g, U
 	//Return success
 	return mTexture != NULL;
 }
+#endif
 
 void LTexture::free()
 {

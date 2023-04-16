@@ -134,9 +134,6 @@ int Enermy::getY() {
 void Enermy::move() {
 	mPosX += mVelX;
 	mPosY += mVelY;
-
-	//cout << "PosY: " << mPosY << " SCREEN_HEIGHT: " <<  SCREEN_HEIGHT << endl;
-
 	if (mPosY > SCREEN_HEIGHT)
 	{
 		renew_flag = true;
@@ -146,29 +143,8 @@ void Enermy::move() {
 	{
 		renew_flag = false;
 		mPosX = rand() % (SCREEN_WIDTH - mWidth);
-		mPosY = -mHeight - 50;
+		mPosY = - 2* mHeight;
 	}
-
-	/*
-	// Giới hạn vị trí của Enermy trong khu vực của cửa sổ
-	if (mPosX < 0) {
-		mVelX = -mVelX;
-		//mPosX = 0;
-	}
-	else if (mPosX > SCREEN_WIDTH - mWidth) {
-		mVelX = -mVelX;
-		//mPosX = SCREEN_WIDTH - mWidth;
-	}
-
-	if (mPosY < 0) {
-		mVelY = -mVelY;
-		//mPosY = 0;
-	}
-	else if (mPosY > SCREEN_HEIGHT - mHeight) {
-		mVelY = -mVelY;
-		//mPosY = SCREEN_HEIGHT - mHeight;
-	}
-	*/
 }
 
 void Enermy::setPos(int x, int y) {
