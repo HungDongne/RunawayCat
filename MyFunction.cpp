@@ -95,15 +95,20 @@ bool loadMedia() {
 		success = false;
 	}
 
-	//Load restart rect
-	if (restart.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/wonderful.png") == false)
+	if (gun_fire_effect.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/gun_fire_effect.png") == false)
+	{
+		cout << "Failed to load gun fire effect" << endl;
+		success = false;
+	}
+
+	if (restart.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/wonderful2.png") == false)
 	{
 		cout << "Failed to load restart image" << endl;
 		success = false;
 	}
 
 	//Open the font
-	gFont = TTF_OpenFont("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/fonts/Roboto-BlackItalic.ttf", 28);
+	gFont = TTF_OpenFont("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/fonts/Mochalatte-JRorB.ttf", 40);
 	if (gFont == NULL)
 	{
 		printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
@@ -174,6 +179,7 @@ void close() {
 	gFPSTextTexture.free();
 	Arrow.free();
 	restart.free();
+	tmp_texture.free();
 
 
 	//Free sound
@@ -300,7 +306,7 @@ void gamecalculator()
 	//Mouse pos
 	SDL_GetMouseState(&x_mouse, &y_mouse);
 
-	//Chuyển động
+	//Set v for dog2
 	dog2.setVelocity(0, (SDL_GetTicks() - startTime) / 4000 + 1);
 	cat.move();
 	dog.move();
@@ -310,9 +316,10 @@ void gamecalculator()
 	Arrow.setPos(cat.getX() - (Arrow.getWidth() - cat.getWidth()) / 2, cat.getY() - (Arrow.getHeight() - cat.getHeight()) / 2);
 	angle_arrow = getAngle(x_mouse, y_mouse, Arrow.getX() + Arrow.getWidth() / 2, Arrow.getY() + Arrow.getHeight() / 2);
 
-	cout_score.str("");
-	cout_score << "YOUR SCORE: " << to_string(Score);
-	Font.loadFromRenderedText(cout_score.str().c_str(), 0, 0, 0);
+	
+	cout_score = "";
+	cout_score += "YOUR SCORE: ";
+	Font.loadFromRenderedText(cout_score, 0, 0, 0);
 
 	//Kiểm tra va chạm
 	if (checkCollision(cat, dog) || checkCollision(cat, dog2))
@@ -345,12 +352,18 @@ void gamerender()
 	pate.render(pate.getX(), pate.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
 	dog.render(dog.getX(), dog.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
 	dog2.render(dog2.getX(), dog2.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
-	cat.render(cat.getX(), cat.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
 	Arrow.render(Arrow.getX(), Arrow.getY(), NULL, angle_arrow, NULL, SDL_FLIP_NONE);
+	if (press_mouse)
+	{
+		gun_fire_effect.setPos(Arrow.getX() - (gun_fire_effect.getWidth() - Arrow.getWidth()) / 2, Arrow.getY() - (gun_fire_effect.getHeight() - Arrow.getHeight()) / 2);
+		gun_fire_effect.render(gun_fire_effect.getX(), gun_fire_effect.getY(), NULL, angle_arrow, NULL, SDL_FLIP_NONE);
+		press_mouse = false;
+	}
+	cat.render(cat.getX(), cat.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
 	if (GAME_OVER) {
 		game_over_image.render((SCREEN_WIDTH - game_over_image.getWidth()) / 2, (SCREEN_HEIGHT - game_over_image.getHeight()) / 2, NULL, 0, NULL, SDL_FLIP_NONE);
 	}
-	Font.render(5, 5, NULL, 0, NULL, SDL_FLIP_NONE);
+	Font.render(10, 10, NULL, 0, NULL, SDL_FLIP_NONE);
 }
 
  

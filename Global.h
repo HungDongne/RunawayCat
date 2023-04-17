@@ -37,12 +37,14 @@ extern bool GAME_OVER;
 extern int Score;
 extern int armo;
 extern int Push_Count;
-extern stringstream cout_score;
+extern string cout_score;
 extern Uint32 startTime;
 extern float avgFPS;
 extern float angle_arrow;
 extern LTexture gFPSTextTexture;
 extern LTexture Arrow;
+extern LTexture tmp_texture;
+extern LTexture gun_fire_effect;
 
 extern Mix_Music* Music_sound;
 extern Mix_Chunk* Fire_sound;
@@ -50,9 +52,10 @@ extern Mix_Chunk* Lose_sound;
 extern Mix_Chunk* cat_eat_sound;
 extern Mix_Chunk* Dog_sound;
 extern Mix_Chunk* Ting_sound;
-
 //Mouse pos
 extern int x_mouse;
 extern int y_mouse;
+
+extern bool press_mouse;
 
 #endif // !GLOBAL_H

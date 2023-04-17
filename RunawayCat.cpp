@@ -43,9 +43,14 @@ int main(int argc, char* args[])
 							GAME_OVER = false;
 						}
 					}
+					SDL_Rect tmp_rect;
+					tmp_rect.x = 0;
+					tmp_rect.y = 0;
+					tmp_rect.w = SCREEN_WIDTH;
+					tmp_rect.h = SCREEN_HEIGHT;
 					restart.setPos(0, 0);
 					SDL_RenderClear(gRenderer);
-					restart.render(restart.getX(), restart.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
+					restart.render(restart.getX(), restart.getY(), &tmp_rect, 0, NULL, SDL_FLIP_NONE);
 					SDL_RenderPresent(gRenderer);
 				}
 				if (quit == false) initialize();
@@ -61,6 +66,7 @@ int main(int argc, char* args[])
 						}
 						if (e.type == SDL_MOUSEBUTTONDOWN && Push_Count > 0)
 						{
+							press_mouse = true;
 							Mix_PlayChannel(-1, Fire_sound, 0);
 							//Tính lực đẩy
 							int push_x = -(x_mouse - cat.getX()) / 50 + cat.getXVelocity();

@@ -32,10 +32,12 @@ int Score = 0;
 int armo = 0; 
 int Push_Count = 0;
 Uint32 startTime = SDL_GetTicks();
-stringstream cout_score;
+string cout_score;
 
 LTexture gFPSTextTexture;
 LTexture Arrow;
+LTexture tmp_texture;
+LTexture gun_fire_effect;
 
 Mix_Music* Music_sound = NULL;
 Mix_Chunk* Fire_sound = NULL;
@@ -47,3 +49,5 @@ Mix_Chunk* Ting_sound = NULL;
 //Mouse pos
 int x_mouse = 0;
 int y_mouse = 0;
+
+bool press_mouse = false;
