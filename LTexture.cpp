@@ -154,7 +154,6 @@ int LTexture::getHeight()
 {
 	return mHeight;
 }
-
 void LTexture::setVelocity(int vx, int vy) {
 	mVelX = vx;
 	mVelY = vy;
@@ -169,26 +168,21 @@ int LTexture::getY() {
 }
 
 void LTexture::move() {
+
 	mPosX += mVelX;
 	mPosY += mVelY;
 
-	// Gi?i h?n v? trí c?a LTexture trong khu v?c c?a c?a s?
-	if (mPosX < 0) {
+	if (mPosX <= 2) {
 		mVelX = -mVelX;
-		//mPosX = 0;
 	}
-	else if (mPosX > SCREEN_WIDTH - mWidth) {
+	else if (mPosX >= SCREEN_WIDTH - mWidth - 2) {
 		mVelX = -mVelX;
-		//mPosX = SCREEN_WIDTH - mWidth;
 	}
-
-	if (mPosY < 0) {
+	else if (mPosY <= 2) {
 		mVelY = -mVelY;
-		//mPosY = 0;
 	}
-	else if (mPosY > SCREEN_HEIGHT - mHeight) {
+	else if (mPosY >= SCREEN_HEIGHT - mHeight - 2) {
 		mVelY = -mVelY;
-		//mPosY = SCREEN_HEIGHT - mHeight;
 	}
 }
 
@@ -206,3 +200,20 @@ int LTexture::getYVelocity()
 {
 	return mVelY;
 }
+
+void LTexture::checkvelocity()
+{
+	if (mVelX > 10) mVelX = 10;
+	if (mVelX < -10) mVelX = -10;
+	if (mVelY > 10) mVelY = 10;
+	if (mVelY < -10) mVelY = -10;
+	if (int(SDL_GetTicks() - tmp_time)/ 1400 == 1)
+	{
+		tmp_time = SDL_GetTicks();
+		if (mVelX > 0) mVelX--;
+		if (mVelY > 0) mVelY--;
+		if (mVelX < 0) mVelX++;
+		if (mVelY < 0) mVelY++;
+	}
+}
+

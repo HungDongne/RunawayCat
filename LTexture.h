@@ -49,6 +49,7 @@ public:
 	// Get velocity in x and y direction
 	int getXVelocity();
 	int getYVelocity();
+	void checkvelocity();
 
 	// Get position
 	int getX();
@@ -57,6 +58,7 @@ public:
 	void move();
 
 	void setPos(int x, int y);
+
 private:
 	//The actual hardware texture
 	SDL_Texture* mTexture;

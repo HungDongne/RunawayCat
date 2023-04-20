@@ -101,14 +101,26 @@ bool loadMedia() {
 		success = false;
 	}
 
-	if (restart.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/wonderful2.png") == false)
+	if (bullet_image.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/bullet.png") == false)
+	{
+		cout << "Failed to load bullet image" << endl;
+		success = false;
+	}
+
+	if (treasure.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/treasure.png") == false)
+	{
+		cout << "Failed to load treasure image" << endl;
+		success = false;
+	}
+
+	if (restart.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/wonderful.png") == false)
 	{
 		cout << "Failed to load restart image" << endl;
 		success = false;
 	}
 
 	//Open the font
-	gFont = TTF_OpenFont("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/fonts/Mochalatte-JRorB.ttf", 40);
+	gFont = TTF_OpenFont("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/fonts/Minecraft.ttf", 25);
 	if (gFont == NULL)
 	{
 		printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
@@ -168,7 +180,7 @@ bool loadMedia() {
 }
 
 void close() {
-	//Free LTexture, image, enermy and food;
+
 	cat.free();
 	dog.free();
 	dog2.free();
@@ -179,10 +191,10 @@ void close() {
 	gFPSTextTexture.free();
 	Arrow.free();
 	restart.free();
+	bullet_image.free();
 	tmp_texture.free();
+	treasure.free();
 
-
-	//Free sound
 	Mix_FreeMusic(Music_sound);
 	Music_sound = NULL;
 	Mix_FreeChunk(Fire_sound);
@@ -196,13 +208,10 @@ void close() {
 	Mix_FreeChunk(Ting_sound);
 	Ting_sound = NULL;
 
-	//Free global font
 	TTF_CloseFont(gFont);
 	gFont = NULL;
-
 	SDL_DestroyRenderer(gRenderer);
 	gRenderer = nullptr;
-
 	SDL_DestroyWindow(gWindow);
 	gWindow = nullptr;
 
@@ -259,12 +268,14 @@ bool checkCollision(LTexture& a, Food& b) //Kiểm tra va chạm
 	//Trả về kết quả
 	return true;
 }
-
+Uint32 time_reload;
 void Push_Calculator()
 {
-	Uint32 deltaTime = SDL_GetTicks();
-	int seconds = (float)deltaTime / 1000;
-	Push_Count += seconds / 1.5;
+	if ((SDL_GetTicks() - time_reload) / 1300 >= 1)
+	{
+		bullet_count++;
+		time_reload = SDL_GetTicks();
+	}
 }
 
 void initialize()
@@ -283,7 +294,7 @@ void initialize()
 	cat.setPos((SCREEN_WIDTH - cat.getWidth()) / 2, (SCREEN_HEIGHT - cat.getHeight()) / 2);
 	cat.setVelocity(0, 1);
 	cat.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/cat.png");
-	Push_Count = 3;
+	bullet_count = 3;
 
 	//Set enermy information
 	dog.setVelocity(0, 1);
@@ -291,6 +302,10 @@ void initialize()
 	dog.setPos(rand() % (SCREEN_WIDTH - dog.getWidth()), -dog.getHeight());
 	dog2.setPos(rand() % (SCREEN_WIDTH - dog2.getWidth()), -dog2.getHeight());
 	Arrow.setPos((SCREEN_WIDTH - Arrow.getWidth()) / 2, (SCREEN_HEIGHT - Arrow.getHeight()) / 2);
+
+	//Treasure
+	treasure.setVelocity(0, 2);
+	treasure.setPos(rand() % (SCREEN_WIDTH - treasure.getWidth()), -treasure.getHeight() - 20);
 }
 
 double getAngle(double x, double y, double x0, double y0) {
@@ -303,22 +318,23 @@ double getAngle(double x, double y, double x0, double y0) {
 
 void gamecalculator()
 {
+	Push_Calculator();
 	//Mouse pos
 	SDL_GetMouseState(&x_mouse, &y_mouse);
+	cat.checkvelocity();
 
-	//Set v for dog2
-	dog2.setVelocity(0, (SDL_GetTicks() - startTime) / 4000 + 1);
+	dog2.setVelocity(0, (SDL_GetTicks() - startTime) / 5500 + 1);
 	cat.move();
 	dog.move();
 	dog2.move();
+	treasure.move();
 
 	//Calculator Arrow angle and position
 	Arrow.setPos(cat.getX() - (Arrow.getWidth() - cat.getWidth()) / 2, cat.getY() - (Arrow.getHeight() - cat.getHeight()) / 2);
 	angle_arrow = getAngle(x_mouse, y_mouse, Arrow.getX() + Arrow.getWidth() / 2, Arrow.getY() + Arrow.getHeight() / 2);
 
-	
-	cout_score = "";
-	cout_score += "YOUR SCORE: ";
+	cout_score = "YOUR SCORE: ";
+	cout_score += to_string(Score);
 	Font.loadFromRenderedText(cout_score, 0, 0, 0);
 
 	//Kiểm tra va chạm
@@ -331,6 +347,7 @@ void gamecalculator()
 		Mix_PlayChannel(-1, cat_eat_sound, 0);
 		Mix_PlayChannel(-1, Ting_sound, 0);
 		Score++;
+		bullet_count += 2;
 		pate.renew();
 	}
 
@@ -341,14 +358,12 @@ void gamecalculator()
 		Mix_PauseMusic();
 		Mix_PlayChannel(-1, Lose_sound, 0);
 	}
-	Push_Calculator();
 }
 
 void gamerender()
 {
-	//Render background to screen
 	background.render(0, 0, NULL, 0, NULL, SDL_FLIP_NONE);
-	//Render
+
 	pate.render(pate.getX(), pate.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
 	dog.render(dog.getX(), dog.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
 	dog2.render(dog2.getX(), dog2.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
@@ -359,11 +374,21 @@ void gamerender()
 		gun_fire_effect.render(gun_fire_effect.getX(), gun_fire_effect.getY(), NULL, angle_arrow, NULL, SDL_FLIP_NONE);
 		press_mouse = false;
 	}
+	treasure.render(treasure.getX(), treasure.getY());
+	cout << treasure.getX() << " " << treasure.getY() << endl;
 	cat.render(cat.getX(), cat.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
 	if (GAME_OVER) {
+		highest_score = max(highest_score, Score);
 		game_over_image.render((SCREEN_WIDTH - game_over_image.getWidth()) / 2, (SCREEN_HEIGHT - game_over_image.getHeight()) / 2, NULL, 0, NULL, SDL_FLIP_NONE);
 	}
-	Font.render(10, 10, NULL, 0, NULL, SDL_FLIP_NONE);
+	bullet_image.render(bullet_image.getX(), bullet_image.getY());
+	Font.render(15, 15, NULL, 0, NULL, SDL_FLIP_NONE);
+
+	cout_score = ": ";
+	cout_score += to_string(bullet_count);
+	Font.loadFromRenderedText(cout_score, 0, 0, 0);
+	Font.render(SCREEN_WIDTH - 60, 28);
+	bullet_image.setPos(SCREEN_WIDTH - bullet_image.getWidth() - 75, 10);
 }
 
  

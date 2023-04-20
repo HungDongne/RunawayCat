@@ -30,7 +30,7 @@ float avgFPS = 0;
 float angle_arrow = 0;
 int Score = 0;
 int armo = 0; 
-int Push_Count = 0;
+int bullet_count = 0;
 Uint32 startTime = SDL_GetTicks();
 string cout_score;
 
@@ -38,7 +38,8 @@ LTexture gFPSTextTexture;
 LTexture Arrow;
 LTexture tmp_texture;
 LTexture gun_fire_effect;
-
+LTexture bullet_image;
+Enermy treasure;
 Mix_Music* Music_sound = NULL;
 Mix_Chunk* Fire_sound = NULL;
 Mix_Chunk* Lose_sound = NULL;
@@ -51,3 +52,5 @@ int x_mouse = 0;
 int y_mouse = 0;
 
 bool press_mouse = false;
+int highest_score = 0;
+Uint32 tmp_time = 0;

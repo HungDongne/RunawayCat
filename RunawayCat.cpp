@@ -24,6 +24,7 @@ int main(int argc, char* args[])
 		}
 		else
 		{
+			highest_score = 0;
 			bool quit = false;
 			SDL_Event e;
 			initialize();
@@ -46,11 +47,21 @@ int main(int argc, char* args[])
 					SDL_Rect tmp_rect;
 					tmp_rect.x = 0;
 					tmp_rect.y = 0;
-					tmp_rect.w = SCREEN_WIDTH;
-					tmp_rect.h = SCREEN_HEIGHT;
-					restart.setPos(0, 0);
+					tmp_rect.w = 600;
+					tmp_rect.h = 600;
+
 					SDL_RenderClear(gRenderer);
-					restart.render(restart.getX(), restart.getY(), &tmp_rect, 0, NULL, SDL_FLIP_NONE);
+					restart.setPos(0, 0);
+					restart.render(restart.getX(), restart.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
+
+					string tmp_string = "Press SPACE to RESTART";
+					Font.loadFromRenderedText(tmp_string, 0, 0, 0);
+					Font.render((SCREEN_WIDTH - Font.getWidth()) / 2, (SCREEN_HEIGHT - Font.getHeight()) / 2 + 310, NULL, 0, NULL, SDL_FLIP_NONE);
+
+					tmp_string = "YOUR HIGHEST SCORE: " + to_string(highest_score);
+					Font.loadFromRenderedText(tmp_string, 0, 0, 0);
+					Font.render((SCREEN_WIDTH - Font.getWidth()) / 2, 60);
+
 					SDL_RenderPresent(gRenderer);
 				}
 				if (quit == false) initialize();
@@ -64,21 +75,21 @@ int main(int argc, char* args[])
 							quit = true;
 							GAME_OVER = true;
 						}
-						if (e.type == SDL_MOUSEBUTTONDOWN && Push_Count > 0)
+						if (e.type == SDL_MOUSEBUTTONDOWN && bullet_count > 0)
 						{
-							press_mouse = true;
 							Mix_PlayChannel(-1, Fire_sound, 0);
 							//Tính lực đẩy
-							int push_x = -(x_mouse - cat.getX()) / 50 + cat.getXVelocity();
-							int push_y = -(y_mouse - cat.getY()) / 50 + cat.getYVelocity();
+							tmp_time = SDL_GetTicks();
+							int push_x = -(x_mouse - cat.getX()) / 40 + cat.getXVelocity();
+							int push_y = -(y_mouse - cat.getY()) / 40 + cat.getYVelocity();
 							cat.setVelocity(push_x, push_y);
-							Push_Count--;
+							bullet_count--;
+							press_mouse = true;
 						}
 					}
 					//Clear screen
 					SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 					SDL_RenderClear(gRenderer);
-
 					gamecalculator();
 					gamerender();
 
