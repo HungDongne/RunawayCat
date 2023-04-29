@@ -269,9 +269,9 @@ bool checkCollision(LTexture& a, Food& b) //Kiểm tra va chạm
 	return true;
 }
 Uint32 time_reload;
-void Push_Calculator()
+void Bullet_calculator()
 {
-	if ((SDL_GetTicks() - time_reload) / 1300 >= 1)
+	if ((SDL_GetTicks() - time_reload) / 1650 >= 1)
 	{
 		bullet_count++;
 		time_reload = SDL_GetTicks();
@@ -288,6 +288,7 @@ void initialize()
 	SDL_SetCursor(cursor);
 	Score = 0;
 	startTime = SDL_GetTicks();
+	treasure_armor = 3;
 	//Set food position
 	pate.renew();
 	//Position cat first append
@@ -304,7 +305,7 @@ void initialize()
 	Arrow.setPos((SCREEN_WIDTH - Arrow.getWidth()) / 2, (SCREEN_HEIGHT - Arrow.getHeight()) / 2);
 
 	//Treasure
-	treasure.setVelocity(0, 2);
+	treasure.setVelocity(0, 1);
 	treasure.setPos(rand() % (SCREEN_WIDTH - treasure.getWidth()), -treasure.getHeight() - 20);
 }
 
@@ -318,12 +319,29 @@ double getAngle(double x, double y, double x0, double y0) {
 
 void gamecalculator()
 {
-	Push_Calculator();
+	Bullet_calculator();
 	//Mouse pos
 	SDL_GetMouseState(&x_mouse, &y_mouse);
 	cat.checkvelocity();
+	dog2.setVelocity(0, (SDL_GetTicks() - startTime) / 6000 + 1);
 
-	dog2.setVelocity(0, (SDL_GetTicks() - startTime) / 5500 + 1);
+
+	if (checkCollision(cat, treasure))
+	{
+		if (treasure_armor == 1)
+		{
+			Score += 5;
+			bullet_count += 5;
+			treasure.setPos(rand() % (SCREEN_WIDTH - treasure.getWidth()), -200);
+			treasure_armor = 3;
+		}
+		else
+		{
+			cat.setVelocity(-cat.getXVelocity(), -cat.getYVelocity());
+			treasure_armor--;
+		}
+	}
+
 	cat.move();
 	dog.move();
 	dog2.move();
@@ -350,6 +368,7 @@ void gamecalculator()
 		bullet_count += 2;
 		pate.renew();
 	}
+	
 
 	//Nếu đã va chạm thì dừng lại
 	if (GAME_OVER == true) {
@@ -374,8 +393,8 @@ void gamerender()
 		gun_fire_effect.render(gun_fire_effect.getX(), gun_fire_effect.getY(), NULL, angle_arrow, NULL, SDL_FLIP_NONE);
 		press_mouse = false;
 	}
+
 	treasure.render(treasure.getX(), treasure.getY());
-	cout << treasure.getX() << " " << treasure.getY() << endl;
 	cat.render(cat.getX(), cat.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
 	if (GAME_OVER) {
 		highest_score = max(highest_score, Score);
@@ -388,6 +407,11 @@ void gamerender()
 	cout_score += to_string(bullet_count);
 	Font.loadFromRenderedText(cout_score, 0, 0, 0);
 	Font.render(SCREEN_WIDTH - 60, 28);
+
+	string tmp_string = "" + to_string(treasure_armor);
+	Font.loadFromRenderedText(tmp_string, 0, 0, 0);
+	Font.render(treasure.getX() + treasure.getWidth(), treasure.getY());
+
 	bullet_image.setPos(SCREEN_WIDTH - bullet_image.getWidth() - 75, 10);
 }
 

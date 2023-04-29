@@ -37,6 +37,8 @@ extern bool GAME_OVER;
 extern int Score;
 extern int armo;
 extern int bullet_count;
+extern int treasure_armor;
+
 extern string cout_score;
 extern Uint32 startTime;
 extern float avgFPS;

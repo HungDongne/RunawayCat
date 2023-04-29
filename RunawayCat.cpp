@@ -98,7 +98,6 @@ int main(int argc, char* args[])
 				}
 				if (quit == false) SDL_Delay(1000);
 			}
-
 		}
 	}
 

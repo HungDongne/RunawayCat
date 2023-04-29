@@ -9,7 +9,7 @@ bool loadMedia();
 void close();
 bool checkCollision(LTexture& a, Enermy& b);
 bool checkCollision(LTexture& a, Food& b);
-void Push_Calculator();
+void Bullet_calculator();
 void initialize();
 double getAngle(double x, double y, double x0, double y0);
 void gamecalculator();

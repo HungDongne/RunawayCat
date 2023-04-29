@@ -31,6 +31,8 @@ float angle_arrow = 0;
 int Score = 0;
 int armo = 0; 
 int bullet_count = 0;
+int treasure_armor = 0;
+
 Uint32 startTime = SDL_GetTicks();
 string cout_score;
 
