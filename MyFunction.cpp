@@ -246,9 +246,8 @@ bool checkCollision(LTexture& a, Enermy& b) //Kiểm tra va chạm
 	return true;
 }
 
-bool checkCollision(LTexture& a, Food& b) //Kiểm tra va chạm
+bool checkCollision(LTexture& a, Food& b)
 {
-	//Xác định vùng chồng lấp giữa 2 hình chữ nhật
 	int leftA = a.getX();
 	int rightA = a.getX() + a.getWidth();
 	int topA = a.getY();
@@ -295,7 +294,10 @@ void initialize()
 	cat.setPos((SCREEN_WIDTH - cat.getWidth()) / 2, (SCREEN_HEIGHT - cat.getHeight()) / 2);
 	cat.setVelocity(0, 1);
 	cat.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/cat.png");
+
 	bullet_count = 3;
+	bullet_image.setPos(SCREEN_WIDTH - bullet_image.getWidth() - 75, 10);
+
 
 	//Set enermy information
 	dog.setVelocity(0, 1);
@@ -322,13 +324,14 @@ void gamecalculator()
 	Bullet_calculator();
 	//Mouse pos
 	SDL_GetMouseState(&x_mouse, &y_mouse);
+
 	cat.checkvelocity();
 	dog2.setVelocity(0, (SDL_GetTicks() - startTime) / 6000 + 1);
 
 
 	if (checkCollision(cat, treasure))
 	{
-		if (treasure_armor == 1)
+		if (treasure_armor == 0)
 		{
 			Score += 5;
 			bullet_count += 5;
@@ -337,8 +340,21 @@ void gamecalculator()
 		}
 		else
 		{
-			cat.setVelocity(-cat.getXVelocity(), -cat.getYVelocity());
+			int tmpvelX = 0, tmpvelY = 0;
+			if (-cat.getXVelocity() < 0) tmpvelX = -1;
+			if (-cat.getXVelocity() > 0) tmpvelX = 1;
+			if (-cat.getYVelocity() < 0) tmpvelY = -1;
+			if (-cat.getYVelocity() > 0) tmpvelY = 1;
+
+			cat.setVelocity(-cat.getXVelocity() + tmpvelX, -cat.getYVelocity() + tmpvelY);
 			treasure_armor--;
+			
+
+			cout << cat.getXVelocity() << " " << cat.getYVelocity() << " " << treasure.getXVelocity() << " " << treasure.getYVelocity() << endl;
+			/*
+			SDL_Delay(5000);
+			*/
+			
 		}
 	}
 
@@ -409,10 +425,28 @@ void gamerender()
 	Font.render(SCREEN_WIDTH - 60, 28);
 
 	string tmp_string = "" + to_string(treasure_armor);
-	Font.loadFromRenderedText(tmp_string, 0, 0, 0);
+	if (treasure_armor == 0)
+	{
+		Font.loadFromRenderedText(tmp_string, 255, 0, 0);
+	}
+	else
+	{
+		Font.loadFromRenderedText(tmp_string, 0, 0, 0);
+	}
 	Font.render(treasure.getX() + treasure.getWidth(), treasure.getY());
 
-	bullet_image.setPos(SCREEN_WIDTH - bullet_image.getWidth() - 75, 10);
 }
 
+bool checkCollision(int& mousex, int& mousey, LTexture& tmpp)
+{
+	int LeftX = tmpp.getX();
+	int RightX = tmpp.getX() + tmpp.getWidth();
+	int TopY = tmpp.getY();
+	int BottomY = tmpp.getY() + tmpp.getHeight();
+	if ((mousex >= LeftX && mousey <= RightX) && (mousey >= TopY && mousey <= BottomY))
+	{
+		return true;
+	}
+	return false;
+}
  

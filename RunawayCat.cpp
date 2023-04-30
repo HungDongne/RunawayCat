@@ -10,14 +10,12 @@ using namespace std;
 
 int main(int argc, char* args[])
 {
-	//Start up SDL and create window
 	if (!init())
 	{
 		cout << "Failed to initialize!" << endl;
 	}
 	else
 	{
-		//Load media
 		if (!loadMedia())
 		{
 			cout << "Failed to load media!" << endl;
@@ -28,6 +26,7 @@ int main(int argc, char* args[])
 			bool quit = false;
 			SDL_Event e;
 			initialize();
+			bool START_GAME = false;
 			while (quit == false)
 			{
 				while (GAME_OVER == true && quit == false)
@@ -39,22 +38,30 @@ int main(int argc, char* args[])
 							quit = true;
 							GAME_OVER = false;
 						}
-						if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_SPACE)
+						if (e.type == SDL_KEYDOWN)
 						{
-							GAME_OVER = false;
+							if (e.key.keysym.sym == SDLK_SPACE) GAME_OVER = false;
+							if (e.key.keysym.sym == SDLK_KP_ENTER) GAME_OVER = false;
+							if (e.key.keysym.sym == SDLK_RETURN) GAME_OVER = false;
+						}
+						if (e.type == SDL_MOUSEBUTTONDOWN)
+						{
+							SDL_GetMouseState(&x_mouse, &y_mouse);
+
+							int i = 1;
+							if (checkCollision(x_mouse, y_mouse, restart))
+							{
+								cout << i << endl;
+								i++;
+								cout << restart.getX() << " " << restart.getY() << endl;
+							}
 						}
 					}
-					SDL_Rect tmp_rect;
-					tmp_rect.x = 0;
-					tmp_rect.y = 0;
-					tmp_rect.w = 600;
-					tmp_rect.h = 600;
 
 					SDL_RenderClear(gRenderer);
-					restart.setPos(0, 0);
 					restart.render(restart.getX(), restart.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
 
-					string tmp_string = "Press SPACE to RESTART";
+					string tmp_string = "Press SPACE/ENTER to RESTART";
 					Font.loadFromRenderedText(tmp_string, 0, 0, 0);
 					Font.render((SCREEN_WIDTH - Font.getWidth()) / 2, (SCREEN_HEIGHT - Font.getHeight()) / 2 + 310, NULL, 0, NULL, SDL_FLIP_NONE);
 
@@ -64,7 +71,7 @@ int main(int argc, char* args[])
 
 					SDL_RenderPresent(gRenderer);
 				}
-				if (quit == false) initialize();
+				initialize();
 				if (quit == false) Mix_PlayMusic(Music_sound, -1);
 				while (GAME_OVER == false && quit == false)
 				{
@@ -80,8 +87,8 @@ int main(int argc, char* args[])
 							Mix_PlayChannel(-1, Fire_sound, 0);
 							//Tính lực đẩy
 							tmp_time = SDL_GetTicks();
-							int push_x = -(x_mouse - cat.getX()) / 40 + cat.getXVelocity();
-							int push_y = -(y_mouse - cat.getY()) / 40 + cat.getYVelocity();
+							int push_x = -(x_mouse - cat.getX()) / 45 + cat.getXVelocity();
+							int push_y = -(y_mouse - cat.getY()) / 45 + cat.getYVelocity();
 							cat.setVelocity(push_x, push_y);
 							bullet_count--;
 							press_mouse = true;
@@ -96,14 +103,12 @@ int main(int argc, char* args[])
 					//Update screen
 					SDL_RenderPresent(gRenderer);
 				}
-				if (quit == false) SDL_Delay(1000);
+				SDL_Delay(1000);
 			}
 		}
 	}
 
-	//Delay time
 	SDL_Delay(1000);
-	//Free resources and close SDL
 	close();
 	return 0;
 }

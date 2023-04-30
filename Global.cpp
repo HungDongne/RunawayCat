@@ -25,7 +25,7 @@ Enermy dog2;
 Food pate;
 LTexture restart;
 
-bool GAME_OVER = false;
+bool GAME_OVER = true;
 float avgFPS = 0;
 float angle_arrow = 0;
 int Score = 0;
