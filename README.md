@@ -13,6 +13,9 @@
     
     - Sử dụng chuột
     - Nháy vào màn hình để tạo lực đẩy chú mèo đi
+    - Ăn pate sẽ giúp +1 điểm và +2 đạn
+    - Ăn hòm kho báu sẽ giúp +5 điểm và +5 đạn
+    - Nhấn vào "HOW TO PLAY?" ở trong phần menu để biết thêm chi tiết
 
 # Installation Instruction:
 
