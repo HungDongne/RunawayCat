@@ -1,231 +1,7 @@
 ﻿#include "MyFunction.h"
 
-
-bool init()
+bool checkCollision(LTexture& a, Enermy& b) 
 {
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
-	{
-		cout << "SDL couldn't initialize! SDL error: " << SDL_GetError() << endl;
-		return false;
-	}
-
-	if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
-		cout << "Warning: Linear texture filtering not enabled!" << endl;
-	}
-
-	gWindow = SDL_CreateWindow("KittyShot", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-	if (gWindow == NULL)
-	{
-		cout << "Window coundn't not be created! SDL error: " << SDL_GetError() << endl;
-		return false;
-	}
-
-	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (gRenderer == NULL) {
-		cout << "Renderer could not be created! SDL Error: " << SDL_GetError() << endl;
-		return false;
-	}
-
-	SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-
-	int imgFlags = IMG_INIT_PNG;
-	if (!(IMG_Init(imgFlags) & imgFlags)) {
-		cout << "SDL_image could not initialize! SDL_image Error: " << IMG_GetError() << endl;
-		return false;
-	}
-
-	//Initialize SDL_mixer
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
-	{
-		cout << "SDL_mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << endl;
-		return false;
-	}
-
-	if (TTF_Init() == -1) {
-		cout << "SDL_ttf could not initialize! SDL_ttf Error: " << TTF_GetError() << endl;
-		return false;
-	}
-
-	return true;
-}
-
-bool loadMedia() {
-	bool success = true;
-
-	// Tải hình ảnh background
-	if (background.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/background2.png") == false) {
-		cout << "Failed to load background image" << endl;
-		success = false;
-	}
-
-	//Load cat
-	if (cat.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/cat.png") == false) {
-		cout << "Failed to load cat image!" << endl;
-		success = false;
-	}
-
-	//Load dog1
-	if (dog.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/doggo.png") == false) {
-		cout << "Failed to load doggo image!" << endl;
-		success = false;
-	}
-	
-	//Load dog2
-	if (dog2.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/doggo2.png") == false) {
-		cout << "Failed to load doggo2 image!" << endl;
-		success = false;
-	}
-
-	//Load game_over_image
-	if (game_over_image.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/game_over_image.png") == false) {
-		cout << "Failed to load game_over_image!" << endl;
-		success = false;
-	}
-
-	//Load food image
-	if (pate.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/pate.png") == false) {
-		cout << "Failed to load food!" << endl;
-		success = false;
-	}
-
-	//Load Arror image
-	if (Arrow.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/Gun.png") == false)
-	{
-		cout << "Failed to load Arrow image" << endl;
-		success = false;
-	}
-
-	if (gun_fire_effect.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/gun_fire_effect.png") == false)
-	{
-		cout << "Failed to load gun fire effect" << endl;
-		success = false;
-	}
-
-	if (bullet_image.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/bullet.png") == false)
-	{
-		cout << "Failed to load bullet image" << endl;
-		success = false;
-	}
-
-	if (treasure.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/treasure.png") == false)
-	{
-		cout << "Failed to load treasure image" << endl;
-		success = false;
-	}
-
-	if (restart.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/wonderful.png") == false)
-	{
-		cout << "Failed to load restart image" << endl;
-		success = false;
-	}
-
-	//Open the font
-	gFont = TTF_OpenFont("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/fonts/Minecraft.ttf", 25);
-	if (gFont == NULL)
-	{
-		printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
-		success = false;
-	}
-
-	//Render text
-	if (!Font.loadFromRenderedText("RunawayCat?", 0, 0, 0))
-	{
-		printf("Failed to render text texture!\n");
-		success = false;
-	}
-
-	//Load music
-	Music_sound = Mix_LoadMUS("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/music/music.mp3");
-	if (Music_sound == NULL) {
-		cout << "Failed to load Music sound" << endl;
-		success = false;
-	}
-
-	//Load Fire sound effect
-	Fire_sound = Mix_LoadWAV("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/music/gun_fire_effect.wav");
-	if (Fire_sound == NULL) {
-		cout << "Failed to load Fire effect" << endl;
-		success = false;
-	}
-
-	//Load Ting sound effect
-	Ting_sound = Mix_LoadWAV("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/music/ting_sound.wav");
-	if (Ting_sound == NULL) {
-		cout << "Failed to load ting effect" << endl;
-		success = false;
-	}
-
-	//Load lose sound effect
-	Lose_sound = Mix_LoadWAV("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/music/lose_music.wav");
-	if (Lose_sound == NULL) {
-		cout << "Failed to load lose effect" << endl;
-		success = false;
-	}
-
-	//Load dog sound effect
-	Dog_sound = Mix_LoadWAV("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/music/dog_sound.wav");
-	if (Dog_sound == NULL) {
-		cout << "Failed to load dog effect" << endl;
-		success = false;
-	}
-
-	//Load cat_eat sound effect
-	cat_eat_sound = Mix_LoadWAV("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/music/cat_eat_sound.wav");
-	if (cat_eat_sound == NULL) {
-		cout << "Failed to load cat_eat effect" << endl;
-		success = false;
-	}
-
-	return success;
-}
-
-void close() {
-
-	cat.free();
-	dog.free();
-	dog2.free();
-	game_over_image.free();
-	background.free();
-	pate.free();
-	Font.free();
-	gFPSTextTexture.free();
-	Arrow.free();
-	restart.free();
-	bullet_image.free();
-	tmp_texture.free();
-	treasure.free();
-
-	Mix_FreeMusic(Music_sound);
-	Music_sound = NULL;
-	Mix_FreeChunk(Fire_sound);
-	Fire_sound = NULL;
-	Mix_FreeChunk(Lose_sound);
-	Lose_sound = NULL;
-	Mix_FreeChunk(cat_eat_sound);
-	cat_eat_sound = NULL;
-	Mix_FreeChunk(Dog_sound);
-	Dog_sound = NULL;
-	Mix_FreeChunk(Ting_sound);
-	Ting_sound = NULL;
-
-	TTF_CloseFont(gFont);
-	gFont = NULL;
-	SDL_DestroyRenderer(gRenderer);
-	gRenderer = nullptr;
-	SDL_DestroyWindow(gWindow);
-	gWindow = nullptr;
-
-	Mix_CloseAudio();
-	SDL_FreeSurface(icon);
-	SDL_FreeCursor(cursor);
-	IMG_Quit();
-	SDL_Quit();
-	TTF_Quit();
-}
-
-bool checkCollision(LTexture& a, Enermy& b) //Kiểm tra va chạm
-{
-	//Xác định vùng chồng lấp giữa 2 hình chữ nhật
 	int leftA = a.getX();
 	int rightA = a.getX() + a.getWidth();
 	int topA = a.getY();
@@ -236,13 +12,10 @@ bool checkCollision(LTexture& a, Enermy& b) //Kiểm tra va chạm
 	int topB = b.getY();
 	int bottomB = b.getY() + b.getHeight();
 
-	//Kiểm tra 2 hình chữ nhật có va chạm nhau hay không
 	if (bottomA <= topB || topA >= bottomB || rightA <= leftB || leftA >= rightB)
 	{
 		return false;
 	}
-
-	//Trả về kết quả
 	return true;
 }
 
@@ -258,13 +31,10 @@ bool checkCollision(LTexture& a, Food& b)
 	int topB = b.getY();
 	int bottomB = b.getY() + b.getHeight();
 
-	//Kiểm tra 2 hình chữ nhật có va chạm nhau hay không
 	if (bottomA <= topB || topA >= bottomB || rightA <= leftB || leftA >= rightB)
 	{
 		return false;
 	}
-
-	//Trả về kết quả
 	return true;
 }
 Uint32 time_reload;
@@ -277,62 +47,75 @@ void Bullet_calculator()
 	}
 }
 
+double getAngle(double x, double y, double x0, double y0) {
+	x -= x0;
+	y -= y0;
+	return atan2(y, x) * 180 / M_PI;
+}
+
+bool checkCollision(int& mousex, int& mousey, LTexture& tmpp)
+{
+	int LeftX = tmpp.getX();
+	int RightX = tmpp.getX() + tmpp.getWidth();
+	int TopY = tmpp.getY();
+	int BottomY = tmpp.getY() + tmpp.getHeight();
+	if ((mousex >= LeftX && mousex <= RightX) && (mousey >= TopY && mousey <= BottomY))
+	{
+		return true;
+	}
+	return false;
+}
+
 void initialize()
 {
-	//Set seed for random
 	srand(time(0));
-	//Chỉnh sửa chuột máy tính
+
+	//if (Mix_PausedMusic()) Mix_ResumeMusic();
+	Mix_FreeMusic(Music_sound);
+	Music_sound = NULL;
+	Music_sound = Mix_LoadMUS("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/music/music.mp3");
+	if (music_flag == true && GAME_OVER == false) Mix_PlayMusic(Music_sound, -1);
+
 	SDL_Surface* icon = IMG_Load("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/popcat2_mini.png");
 	SDL_Cursor* cursor = SDL_CreateColorCursor(icon, 0, 0);
 	SDL_SetCursor(cursor);
+
 	Score = 0;
 	startTime = SDL_GetTicks();
 	treasure_armor = 3;
-	//Set food position
 	pate.renew();
-	//Position cat first append
+
 	cat.setPos((SCREEN_WIDTH - cat.getWidth()) / 2, (SCREEN_HEIGHT - cat.getHeight()) / 2);
 	cat.setVelocity(0, 1);
 	cat.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/cat.png");
 
 	bullet_count = 3;
-	bullet_image.setPos(SCREEN_WIDTH - bullet_image.getWidth() - 75, 10);
 
-
-	//Set enermy information
 	dog.setVelocity(0, 1);
 	dog2.setVelocity(0, 1);
 	dog.setPos(rand() % (SCREEN_WIDTH - dog.getWidth()), -dog.getHeight());
 	dog2.setPos(rand() % (SCREEN_WIDTH - dog2.getWidth()), -dog2.getHeight());
 	Arrow.setPos((SCREEN_WIDTH - Arrow.getWidth()) / 2, (SCREEN_HEIGHT - Arrow.getHeight()) / 2);
-
+	bullet_image.setPos((SCREEN_WIDTH - bullet_image.getWidth()) / 2 - 15, score_image.getHeight() + 20);
 	//Treasure
 	treasure.setVelocity(0, 1);
 	treasure.setPos(rand() % (SCREEN_WIDTH - treasure.getWidth()), -treasure.getHeight() - 20);
 }
 
-double getAngle(double x, double y, double x0, double y0) {
-	// Tính toán tọa độ mới
-	x -= x0;
-	y -= y0;
-	// Tính góc
-	return atan2(y, x) * 180 / M_PI;
-}
-
 void gamecalculator()
 {
 	Bullet_calculator();
-	//Mouse pos
 	SDL_GetMouseState(&x_mouse, &y_mouse);
 
 	cat.checkvelocity();
 	dog2.setVelocity(0, (SDL_GetTicks() - startTime) / 6000 + 1);
 
-
 	if (checkCollision(cat, treasure))
 	{
 		if (treasure_armor == 0)
 		{
+			Mix_PlayChannel(-1, cat_eat_sound, 0);
+			Mix_PlayChannel(-1, Ting_sound, 0);
 			Score += 5;
 			bullet_count += 5;
 			treasure.setPos(rand() % (SCREEN_WIDTH - treasure.getWidth()), -200);
@@ -340,21 +123,14 @@ void gamecalculator()
 		}
 		else
 		{
+			Mix_PlayChannel(-1, Ting_sound, 0);
 			int tmpvelX = 0, tmpvelY = 0;
 			if (-cat.getXVelocity() < 0) tmpvelX = -1;
 			if (-cat.getXVelocity() > 0) tmpvelX = 1;
 			if (-cat.getYVelocity() < 0) tmpvelY = -1;
 			if (-cat.getYVelocity() > 0) tmpvelY = 1;
-
 			cat.setVelocity(-cat.getXVelocity() + tmpvelX, -cat.getYVelocity() + tmpvelY);
-			treasure_armor--;
-			
-
-			cout << cat.getXVelocity() << " " << cat.getYVelocity() << " " << treasure.getXVelocity() << " " << treasure.getYVelocity() << endl;
-			/*
-			SDL_Delay(5000);
-			*/
-			
+			treasure_armor--;			
 		}
 	}
 
@@ -363,15 +139,9 @@ void gamecalculator()
 	dog2.move();
 	treasure.move();
 
-	//Calculator Arrow angle and position
 	Arrow.setPos(cat.getX() - (Arrow.getWidth() - cat.getWidth()) / 2, cat.getY() - (Arrow.getHeight() - cat.getHeight()) / 2);
 	angle_arrow = getAngle(x_mouse, y_mouse, Arrow.getX() + Arrow.getWidth() / 2, Arrow.getY() + Arrow.getHeight() / 2);
 
-	cout_score = "YOUR SCORE: ";
-	cout_score += to_string(Score);
-	Font.loadFromRenderedText(cout_score, 0, 0, 0);
-
-	//Kiểm tra va chạm
 	if (checkCollision(cat, dog) || checkCollision(cat, dog2))
 	{
 		GAME_OVER = true;
@@ -379,19 +149,20 @@ void gamecalculator()
 	if (checkCollision(cat, pate))
 	{
 		Mix_PlayChannel(-1, cat_eat_sound, 0);
-		Mix_PlayChannel(-1, Ting_sound, 0);
 		Score++;
 		bullet_count += 2;
 		pate.renew();
 	}
 	
-
-	//Nếu đã va chạm thì dừng lại
+	if (music_flag == false && Mix_PausedMusic() == 0) Mix_PauseMusic();
+	if (music_flag == true && Mix_PausedMusic() == 1) Mix_ResumeMusic();
+	if (music_flag == true && Mix_PlayingMusic() == 0) Mix_PlayMusic(Music_sound, -1);
 	if (GAME_OVER == true) {
 		if (cat.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/cat_cry.png") == false)
 			cout << "Failed to load cat_cry image" << endl;
 		Mix_PauseMusic();
 		Mix_PlayChannel(-1, Lose_sound, 0);
+		Music_sound = Mix_LoadMUS("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/music/music-menu.mp3");
 	}
 }
 
@@ -416,13 +187,19 @@ void gamerender()
 		highest_score = max(highest_score, Score);
 		game_over_image.render((SCREEN_WIDTH - game_over_image.getWidth()) / 2, (SCREEN_HEIGHT - game_over_image.getHeight()) / 2, NULL, 0, NULL, SDL_FLIP_NONE);
 	}
+
 	bullet_image.render(bullet_image.getX(), bullet_image.getY());
-	Font.render(15, 15, NULL, 0, NULL, SDL_FLIP_NONE);
 
 	cout_score = ": ";
 	cout_score += to_string(bullet_count);
 	Font.loadFromRenderedText(cout_score, 0, 0, 0);
-	Font.render(SCREEN_WIDTH - 60, 28);
+	Font.render(bullet_image.getX() + bullet_image.getWidth() + 10, bullet_image.getY() + (bullet_image.getHeight() - Font.getHeight()) / 2);
+
+	cout_score = ": ";
+	cout_score += to_string(Score);
+	Font.loadFromRenderedText(cout_score, 0, 0, 0);
+	Font.render((SCREEN_WIDTH - score_image.getWidth() - Font.getWidth()) / 2 + score_image.getWidth() + 5, 20 + (score_image.getHeight() - Font.getHeight()) / 2);
+	score_image.render((SCREEN_WIDTH - score_image.getWidth() - Font.getWidth()) / 2, 20);
 
 	string tmp_string = "" + to_string(treasure_armor);
 	if (treasure_armor == 0)
@@ -434,19 +211,91 @@ void gamerender()
 		Font.loadFromRenderedText(tmp_string, 0, 0, 0);
 	}
 	Font.render(treasure.getX() + treasure.getWidth(), treasure.getY());
+	
+	music_menu.render(music_menu.getX(), music_menu.getY());
 
+	return_button.render(return_button.getX(), return_button.getY());
 }
 
-bool checkCollision(int& mousex, int& mousey, LTexture& tmpp)
+void how_to_play_mode()
 {
-	int LeftX = tmpp.getX();
-	int RightX = tmpp.getX() + tmpp.getWidth();
-	int TopY = tmpp.getY();
-	int BottomY = tmpp.getY() + tmpp.getHeight();
-	if ((mousex >= LeftX && mousey <= RightX) && (mousey >= TopY && mousey <= BottomY))
+	if (music_flag == false)
 	{
-		return true;
+		Mix_PauseMusic();
 	}
-	return false;
+	if (music_flag == true && Mix_PausedMusic())
+	{
+		Mix_ResumeMusic();
+	}
+	background.render(0, 0);
+	music_menu.render(music_menu.getX(), music_menu.getY());
+
+	string tmp_string = "HOW TO PLAY ?";
+	Font.loadFromRenderedText(tmp_string, 0, 0, 0);
+	Font.render((SCREEN_WIDTH - Font.getWidth()) / 2, 30);
+	tmp_texture.render(tmp_texture.getX(), (SCREEN_HEIGHT - tmp_texture.getHeight()) / 2);
+
+	if (turn_left) {
+		right_arrow_image.render(right_arrow_image.getX(), right_arrow_image.getY());
+	}
+	if (turn_right) {
+		left_arrow_image.render(left_arrow_image.getX(), left_arrow_image.getY());
+	}
+
+	return_button.render(return_button.getX(), return_button.getY());
 }
- 
+
+void menu_mode()
+{
+	if (music_flag == false)
+	{
+		Mix_PauseMusic();
+	}
+	if (music_flag == true && Mix_PausedMusic())
+	{
+		Mix_ResumeMusic();
+	}
+	restart.render(restart.getX(), restart.getY(), NULL, 0, NULL, SDL_FLIP_NONE);
+
+	string tmp_string = "PLAY";
+	Font.loadFromRenderedText(tmp_string, 0, 0, 0);
+	how_to_play_title[0].setPos((SCREEN_WIDTH - how_to_play_title[0].getWidth()) / 2 - 320, (SCREEN_HEIGHT - how_to_play_title[0].getHeight()) / 2 - 75);
+	how_to_play_title[0].render(how_to_play_title[0].getX(), how_to_play_title[0].getY());
+	Font.render(how_to_play_title[0].getX() + (how_to_play_title[0].getWidth() - Font.getWidth()) / 2, how_to_play_title[0].getY() + (how_to_play_title[0].getHeight() - Font.getHeight()) / 2);
+
+	tmp_string = "HOW TO PLAY?";
+	Font.loadFromRenderedText(tmp_string, 0, 0, 0);
+	how_to_play_title[1].setPos((SCREEN_WIDTH - how_to_play_title[1].getWidth()) / 2 - 320, how_to_play_title[0].getY() + how_to_play_title[0].getHeight() + 20);
+	how_to_play_title[1].render(how_to_play_title[1].getX(), how_to_play_title[1].getY());
+	Font.render(how_to_play_title[1].getX() + (how_to_play_title[1].getWidth() - Font.getWidth()) / 2, how_to_play_title[1].getY() + (how_to_play_title[1].getHeight() - Font.getHeight()) / 2);
+
+	tmp_string = "EXIT";
+	Font.loadFromRenderedText(tmp_string, 0, 0, 0);
+	how_to_play_title[2].setPos((SCREEN_WIDTH - how_to_play_title[2].getWidth()) / 2 - 320, how_to_play_title[0].getY() + (how_to_play_title[0].getHeight() + 20) * 2);
+	how_to_play_title[2].render(how_to_play_title[2].getX(), how_to_play_title[2].getY());
+	Font.render(how_to_play_title[2].getX() + (how_to_play_title[2].getWidth() - Font.getWidth()) / 2, how_to_play_title[2].getY() + (how_to_play_title[2].getHeight() - Font.getHeight()) / 2);
+
+	tmp_string = "YOUR HIGHEST SCORE: " + to_string(highest_score);
+	Font.loadFromRenderedText(tmp_string, 0, 0, 0);
+	Font.render((SCREEN_WIDTH - Font.getWidth()) / 2, 140);
+
+	tmp_string = "HungDongiuemThao";
+	Font.loadFromRenderedText(tmp_string, 0, 0, 0);
+	Font.render(SCREEN_WIDTH - Font.getWidth() - 10, SCREEN_HEIGHT - Font.getHeight() - 10);
+
+	music_menu.render(music_menu.getX(), music_menu.getY());
+}
+
+void music_config()
+{
+	if (music_flag == true) music_flag = false;
+		else music_flag = true;
+	if (music_flag == true)
+		if (music_menu.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/music-on.png") == false) {
+			cout << "Failed to load music-on!" << endl;
+		}
+	if (music_flag == false)
+		if (music_menu.loadFromFile("C:/Users/Admin/Desktop/Code/C++/RunawayCat/data/images/music-off.png") == false) {
+			cout << "Failed to load music-off!" << endl;
+		}
+}

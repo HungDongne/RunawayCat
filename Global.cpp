@@ -15,6 +15,8 @@ SDL_Surface* icon = NULL;
 
 SDL_Cursor* cursor = NULL;
 
+SDL_Event e;
+
 LTexture cat;
 LTexture mouse_computer;
 LTexture game_over_image;
@@ -42,17 +44,32 @@ LTexture tmp_texture;
 LTexture gun_fire_effect;
 LTexture bullet_image;
 Enermy treasure;
+
 Mix_Music* Music_sound = NULL;
 Mix_Chunk* Fire_sound = NULL;
 Mix_Chunk* Lose_sound = NULL;
 Mix_Chunk* cat_eat_sound = NULL;
 Mix_Chunk* Dog_sound = NULL;
 Mix_Chunk* Ting_sound = NULL;
+Mix_Chunk* cant_shot_sound = NULL;
 
-//Mouse pos
 int x_mouse = 0;
 int y_mouse = 0;
 
 bool press_mouse = false;
 int highest_score = 0;
 Uint32 tmp_time = 0;
+
+
+LTexture music_menu;
+LTexture how_to_play_title[3];
+LTexture return_button;
+LTexture score_image;
+LTexture left_arrow_image;
+LTexture right_arrow_image;
+
+bool how_to_play_flag = false;
+bool music_flag = true;
+
+bool turn_left = false;
+bool turn_right = false;

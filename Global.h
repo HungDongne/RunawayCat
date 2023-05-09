@@ -22,6 +22,8 @@ extern SDL_Surface* icon;
 
 extern SDL_Cursor* cursor;
 
+extern SDL_Event e;
+
 extern LTexture cat;
 extern LTexture mouse_computer;
 extern LTexture game_over_image;
@@ -56,13 +58,27 @@ extern Mix_Chunk* Lose_sound;
 extern Mix_Chunk* cat_eat_sound;
 extern Mix_Chunk* Dog_sound;
 extern Mix_Chunk* Ting_sound;
+extern Mix_Chunk* cant_shot_sound;
 
-//Mouse pos
 extern int x_mouse;
 extern int y_mouse;
 
 extern bool press_mouse;
 
+extern LTexture music_menu;
+extern LTexture how_to_play_title[3];
+extern LTexture return_button;
+extern LTexture score_image;
+extern LTexture left_arrow_image;
+extern LTexture right_arrow_image;
+
+extern bool how_to_play_flag;
+extern bool	music_flag;
+
 extern Uint32 tmp_time;
 extern int highest_score;
+
+extern bool turn_left;
+extern bool turn_right;
+
 #endif // !GLOBAL_H

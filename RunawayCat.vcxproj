@@ -136,6 +136,7 @@
     <ClCompile Include="Enermy.cpp" />
     <ClCompile Include="Food.cpp" />
     <ClCompile Include="Global.cpp" />
+    <ClCompile Include="LoadFile.cpp" />
     <ClCompile Include="LTexture.cpp" />
     <ClCompile Include="LTimer.cpp" />
     <ClCompile Include="MyFunction.cpp" />
@@ -147,6 +148,7 @@
     <ClInclude Include="Food.h" />
     <ClInclude Include="Global.h" />
     <ClInclude Include="Lib.h" />
+    <ClInclude Include="LoadFile.h" />
     <ClInclude Include="LTexture.h" />
     <ClInclude Include="LTimer.h" />
     <ClInclude Include="MyFunction.h" />
